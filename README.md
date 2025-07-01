@@ -5,7 +5,7 @@ This repository investigates the performance of the 5 qubit code, first introduc
 - measures syndromes and attempts to correct the error,
 - and finally measures the physical qubits.
   
-It repeats this procedure for a number of trials, and reports the fraction of trials which had successful final measurements, i.e. measurements of the physical qubits which reflect a component of the correct logical state.
+This code repeats this procedure for a number of trials and reports the fraction of trials which had successful final measurements, i.e. measurements of the physical qubits which reflect a component of the correct logical state.
 
 ### Basic Usage Example
 The main function is `test_QECC_random_Pauli_errors`, which takes in the probability and, optionally, a boolean for the desired logical state and a number of trials. For example:
