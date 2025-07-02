@@ -17,7 +17,7 @@ probability = .1
 test_QECC_random_Pauli_errors(probability, logical_state=1, trials=10000)
 ```
 
-There are additional options and functionality, but, by default, this function will run the above-described experiment. The output for the above call to `test_QECC_random_Pauli_errors` is be a random experimental success rate typically around $0.7$.
+There are additional options and functionality, but, by default, this function will run the above-described experiment. The output for the above call to `test_QECC_random_Pauli_errors` is a random experimental success rate typically around $0.7$.
 
 ### Implementation Details and More
 For implementation details, visualizations of performance as a function of $p$, exploration of the additional functionality beyond that described above, and a comparison with another classic code, Shor's code, see [the iPython notebook](https://github.com/avijka/5-Qubit_QECC_Under_Pauli_Errors/blob/main/5-Qubit_QECC_Under_Pauli_Errors.ipynb) in this repository.
