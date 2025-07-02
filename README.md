@@ -7,7 +7,7 @@ This repository investigates the performance of the 5 qubit code, first introduc
   
 We repeat this procedure for a number of trials and report the fraction of trials which had successful final measurements, i.e. measurements of the code qubits which reflect a component of the correct logical state.
 
-(*) The Pauli gate is chosen independently for each code qubit with $X$, $Y$, $Z$, and $I$ appearing with probability $p$, $p$, $p$, and $1-3p$, respectively.
+(*) The Pauli gate is chosen independently for each code qubit, with $X$, $Y$, $Z$, and $I$ appearing with probability $p$, $p$, $p$, and $1-3p$, respectively.
 
 ### Basic Usage Example
 The main function is `test_QECC_random_Pauli_errors`, which takes in the probability and, optionally, a boolean for the desired logical state and a number of trials. For example:
