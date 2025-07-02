@@ -33,81 +33,81 @@ class Shor_QECC:
 	num_syndromes = 8
 	
 	def __init__(self):
-		self.__qubits_physical = QuantumRegister(size=9, name='p')
-		self.__qubits_for_checks = AncillaRegister(size=8, name='c')
-		self.__syndromes = ClassicalRegister(8, name='s')
+		self.__qubits_code = QuantumRegister(size=9, name='code')
+		self.__qubits_checks = AncillaRegister(size=8, name='check')
+		self.__syndromes = ClassicalRegister(8, name='syndromes')
 		
 	def get_logical_0_preparer(self):
-		preparer_qc = QuantumCircuit(self.__qubits_physical, name='Shor Logical 0\nPreparation')
-		preparer_qc.cx(self.__qubits_physical[0],self.__qubits_physical[3])
-		preparer_qc.cx(self.__qubits_physical[0],self.__qubits_physical[6])
-		preparer_qc.h(self.__qubits_physical[[0,3,6]])
+		preparer_qc = QuantumCircuit(self.__qubits_code, name='Shor Logical 0\nPreparation')
+		preparer_qc.cx(self.__qubits_code[0],self.__qubits_code[3])
+		preparer_qc.cx(self.__qubits_code[0],self.__qubits_code[6])
+		preparer_qc.h(self.__qubits_code[[0,3,6]])
 		for i in range(3):
-			preparer_qc.cx(self.__qubits_physical[3*i], self.__qubits_physical[3*i + 1])
-			preparer_qc.cx(self.__qubits_physical[3*i], self.__qubits_physical[3*i + 2])
+			preparer_qc.cx(self.__qubits_code[3*i], self.__qubits_code[3*i + 1])
+			preparer_qc.cx(self.__qubits_code[3*i], self.__qubits_code[3*i + 2])
 			
 		return preparer_qc.to_gate()
 		
 	def get_logical_X(self):
-		logical_X_qc = QuantumCircuit(self.__qubits_physical, name='Shor Logical X')
-		logical_X_qc.z(self.__qubits_physical[:])
+		logical_X_qc = QuantumCircuit(self.__qubits_code, name='Shor Logical X')
+		logical_X_qc.z(self.__qubits_code[:])
 		return logical_X_qc.to_gate()
 		
 	def __get_error_checker(self):
 		checker_qc = QuantumCircuit(
-			self.__qubits_physical, self.__qubits_for_checks,
+			self.__qubits_code, self.__qubits_checks,
 			name='Shor Error Checker'
 		)
 		
 		# X checks
 		for i in range(3):
-			checker_qc.cx(self.__qubits_physical[3*i], self.__qubits_for_checks[2*i])
-			checker_qc.cx(self.__qubits_physical[3*i+1], self.__qubits_for_checks[2*i])
-			checker_qc.cx(self.__qubits_physical[3*i+1], self.__qubits_for_checks[2*i+1])
-			checker_qc.cx(self.__qubits_physical[3*i+2], self.__qubits_for_checks[2*i+1])
+			checker_qc.cx(self.__qubits_code[3*i], self.__qubits_checks[2*i])
+			checker_qc.cx(self.__qubits_code[3*i+1], self.__qubits_checks[2*i])
+			checker_qc.cx(self.__qubits_code[3*i+1], self.__qubits_checks[2*i+1])
+			checker_qc.cx(self.__qubits_code[3*i+2], self.__qubits_checks[2*i+1])
 		
 		# Z checks
 		for i in range(2):
-			checker_qc.h(self.__qubits_for_checks[i+6])
+			checker_qc.h(self.__qubits_checks[i+6])
 			for j in range(6):
-				checker_qc.cx(self.__qubits_for_checks[i+6], self.__qubits_physical[3*i+j])
-			checker_qc.h(self.__qubits_for_checks[i+6])
+				checker_qc.cx(self.__qubits_checks[i+6], self.__qubits_code[3*i+j])
+			checker_qc.h(self.__qubits_checks[i+6])
     
 		return checker_qc.to_gate()
 	
 	def get_error_corrector(self):
 		corrector_qc = QuantumCircuit(
-			self.__qubits_physical, self.__qubits_for_checks, self.__syndromes,
+			self.__qubits_code, self.__qubits_checks, self.__syndromes,
 			name='Shor Corrector'
 		)
 		
 		# add checker circuit and measure syndromes
 		corrector_qc.compose(self.__get_error_checker(), inplace=True)
 		corrector_qc.barrier()
-		corrector_qc.measure(self.__qubits_for_checks, self.__syndromes)
+		corrector_qc.measure(self.__qubits_checks, self.__syndromes)
 		corrector_qc.barrier()
 		
 		# correct Z errors
 		with corrector_qc.if_test((self.__syndromes[6],1)):
 			with corrector_qc.if_test((self.__syndromes[7],0)):
-				corrector_qc.z(self.__qubits_physical[0:3])
+				corrector_qc.z(self.__qubits_code[0:3])
 		with corrector_qc.if_test((self.__syndromes[6],1)):
 			with corrector_qc.if_test((self.__syndromes[7],1)):
-				corrector_qc.z(self.__qubits_physical[3:6])
+				corrector_qc.z(self.__qubits_code[3:6])
 		with corrector_qc.if_test((self.__syndromes[6],0)):
 			with corrector_qc.if_test((self.__syndromes[7],1)):
-				corrector_qc.z(self.__qubits_physical[6:9])
+				corrector_qc.z(self.__qubits_code[6:9])
 			
 		# correct X errors
 		for i in range(3):
 			with corrector_qc.if_test((self.__syndromes[2*i],1)):
 				with corrector_qc.if_test((self.__syndromes[2*i+1],0)):
-					corrector_qc.x(self.__qubits_physical[3*i])
+					corrector_qc.x(self.__qubits_code[3*i])
 			with corrector_qc.if_test((self.__syndromes[2*i],1)):
 				with corrector_qc.if_test((self.__syndromes[2*i+1],1)):
-					corrector_qc.x(self.__qubits_physical[3*i+1])
+					corrector_qc.x(self.__qubits_code[3*i+1])
 			with corrector_qc.if_test((self.__syndromes[2*i],0)):
 				with corrector_qc.if_test((self.__syndromes[2*i+1],1)):
-					corrector_qc.x(self.__qubits_physical[3*i+2])
+					corrector_qc.x(self.__qubits_code[3*i+2])
 				
 		return corrector_qc
